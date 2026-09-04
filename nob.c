@@ -5,8 +5,12 @@ int main(int argc, char *argv[])
 {
         GO_REBUILD_URSELF(argc, argv);
         Cmd cmd = {0};
-        cmd_append(&cmd, "cc", "-Wall", "-Wextra", "-o", "server.obj",
-                   "src/main.c");
+        cmd_append(&cmd,
+                   "cc", "-Wall", "-Wextra", "-Werror",
+                   "-o", "server.obj",
+                   "-I./third_party",
+                   "src/main.c", "src/header.c"
+                   );
 
         if (!cmd_run(&cmd)) return 1;
 
