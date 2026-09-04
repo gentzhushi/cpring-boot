@@ -1,0 +1,7 @@
+tags
+*.sw?
+
+*.obj
+*.o
+
+nob
