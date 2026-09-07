@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
         Cmd cmd = {0};
         cmd_append(&cmd,
                    "cc", "-Wall", "-Wextra", "-Werror",
+                   "-std=c99",
                    "-o", "server.obj",
                    "-I./third_party",
                    "src/main.c", "src/header.c"
