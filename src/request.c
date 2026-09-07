@@ -88,7 +88,7 @@ request parse_request(char *buf, size_t bufsiz)
         return req;
 }
 
-void req_print(request req)
+void print_request(request req)
 {
         printf("request(\n");
         printf("  method=\"%s\",\n", mstrs[req.m]);
@@ -102,4 +102,14 @@ void req_print(request req)
         printf("    header=(key=\"%s\", value=\"%s\")\n  )\n)\n",
                req.hs[arrlen(req.hs)-1].key,
                req.hs[arrlen(req.hs)-1].value);
+}
+
+int handle_request(request *req)
+{
+        (void)req;
+
+        /* validate_request(); */
+        /* respond();          */
+
+        return 0;
 }

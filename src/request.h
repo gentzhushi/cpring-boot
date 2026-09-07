@@ -26,10 +26,9 @@ typedef struct {
         header *hs;
 } request;
 
-header parse_header(char *line, size_t len);
-
+void    print_request(request req);
+int     handle_request(request *req)
 request parse_request(char *line, size_t len);
-
-void req_print(request req);
+header  parse_header(char *line, size_t len);
 
 #endif /* HTTP_HEADER_H_ */

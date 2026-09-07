@@ -10,7 +10,8 @@
 #include "stb_ds.h"
 #include "header.h"
 
-#define SERVER_PORT 80
+#define SERVER_PORT  80
+#define BACKLOG_SIZE 1
 
 typedef enum {
         F2CRTSK, /* Failed to create socket     */
@@ -19,17 +20,8 @@ typedef enum {
         F2ACCPT, /* Failed to accept connection */
 } exit_codes;
 
+/* Setup the server, return the socket fd upon sucess. Crash on failure. */
 static int setup();
-
-int handle_request(request *req)
-{
-        (void)req;
-
-        /* validate_request(); */
-        /* respond();          */
-
-        return 0;
-}
 
 int main(void)
 {
@@ -47,9 +39,7 @@ int main(void)
                 if (recv(c_sock, buf, BUFSIZ, 0) <= 0) continue;
 
                 request req = parse_request(buf, BUFSIZ);
-                printf("-----REQUEST--------------------------------------\n");
-                req_print(req);
-                printf("--------------------------------------------------\n");
+                print_request(req);
                 handle_request(&req);
 
                 close(c_sock);
@@ -71,8 +61,9 @@ static int setup()
 
         int opt = 1;
         if (setsockopt(s_sock, SOL_SOCKET, SO_REUSEADDR,
-                       &opt, sizeof(opt)) < 0)
+                       &opt, sizeof(opt)) < 0) {
                 perror("socket");
+        }
 
         s_addr.sin_len         = sizeof(s_addr);
         s_addr.sin_family      = AF_INET;
@@ -84,7 +75,7 @@ static int setup()
                 exit(F2BNDSK);
         }
 
-        if (listen(s_sock, 1) < 0) {
+        if (listen(s_sock, BACKLOG_SIZE) < 0) {
                 perror("listen");
                 exit(F2LISTN);
         }
