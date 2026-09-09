@@ -8,7 +8,8 @@
 
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
-#include "header.h"
+#include "request.h"
+#include "respond.h"
 
 #define SERVER_PORT  80
 #define BACKLOG_SIZE 1
@@ -36,11 +37,15 @@ int main(void)
                         exit(F2ACCPT);
                 }
 
-                if (recv(c_sock, buf, BUFSIZ, 0) <= 0) continue;
+                if (recv(c_sock, buf, BUFSIZ, 0) <= 0) {
+                        respond500(c_sock);
+                        close(c_sock);
+                        continue;
+                }
 
                 request req = parse_request(buf, BUFSIZ);
                 print_request(req);
-                handle_request(&req);
+                respond(c_sock, req);
 
                 close(c_sock);
         }

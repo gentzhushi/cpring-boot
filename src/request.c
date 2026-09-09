@@ -1,7 +1,8 @@
-#include "header.h"
+#include "request.h"
 #include "stb_ds.h"
 #include <string.h>
 #include <stdio.h>
+#include <sys/socket.h>
 
 static int _headers_done(const char* buf)
 {
@@ -14,12 +15,13 @@ header parse_header(char* line, size_t len)
 
         header hdr = {0};
 
+        hdr.key = line;
         value         = memchr(line, ' ', len);
         *(value - 1)  = '\0';   /* set column (:) to nul (create new string) */
-        value        += 1;      /* move value to the start of the new string */
-        line[len] = '\0';
 
-        hdr.key = line;
+        value        += 1;      /* move value to the start of the new string */
+        line[len]     = '\0';
+
         hdr.value = value;
 
         return hdr;
@@ -97,19 +99,10 @@ void print_request(request req)
         int i;
         printf("  headers=(\n");
         for (i = 0; i < arrlen(req.hs) - 1; i++)
-                printf("    header=(key=\"%s\", value=\"%s\"),\n", req.hs[i].key, req.hs[i].value);
+                printf("    header=(key=\"%s\", value=\"%s\"),\n",
+                       req.hs[i].key, req.hs[i].value);
 
         printf("    header=(key=\"%s\", value=\"%s\")\n  )\n)\n",
                req.hs[arrlen(req.hs)-1].key,
                req.hs[arrlen(req.hs)-1].value);
-}
-
-int handle_request(request *req)
-{
-        (void)req;
-
-        /* validate_request(); */
-        /* respond();          */
-
-        return 0;
 }
