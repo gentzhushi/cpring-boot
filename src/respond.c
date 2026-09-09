@@ -17,12 +17,24 @@ void _respond500(int c_sock, struct respond500args args)
                  "<html>" CRLF
                   "<head>" CRLF
                    "<title>%s</title>" CRLF
+                   "<style>" CRLF
+                    "* { background-color:white; color:black} " CRLF
+                    "@media (prefers-color-scheme:dark) {" CRLF
+                     "* {" CRLF
+                      "background-color:black; color:white" CRLF
+                     "}" CRLF
+                    "}" CRLF
+                   "</style>" CRLF
                   "</head>" CRLF
                   "<body style=\"display:flex;justify-content:center;" CRLF
                                 "align-items:center\">" CRLF
                    "<div style=\"max-width:50%%;display:flex;"
-                                "justify-content:center;align-items:center;" CRLF
+                                "justify-content:start;align-items:center;" CRLF
                                 "flex-direction:column\">" CRLF
+                    "<h1 style=\"font-family:sans-serif;font-size:128px;"
+                                "margin-bottom: 0\">"
+                     "500"
+                    "</h1>" CRLF
                     "<h1 style=\"font-family:sans-serif\">"
                      "%s"
                     "</h1>" CRLF
@@ -30,7 +42,7 @@ void _respond500(int c_sock, struct respond500args args)
                     "<p style=\"text-align:center\">" CRLF
                      "%s" CRLF
                     "</p>" CRLF
-                    "<p style=\"font-style:italic;font:8px;color:grey\">" CRLF
+                    "<p style=\"font-style:italic;color:grey\">" CRLF
                      "Clang Boot 0.1" CRLF
                     "</p>" CRLF
                    "</div>" CRLF
@@ -49,7 +61,12 @@ void _respond500(int c_sock, struct respond500args args)
 int respond(int sock, request req)
 {
         if (!(strncmp(req.r, "/ok", 4) == 0)) {
-                respond500(sock, .title = "You lost boy?", .message = "Wrong page");
+                respond500(sock,
+                   .message = "This is an internal server error. Lorem ipsum "
+                              "dolor sit amet, consectetur adipiscing elit, "
+                              "sed do eiusmod tempor incididunt ut labore et "
+                              "dolore magna aliqua."
+                );
                 return 500;
         }
 
