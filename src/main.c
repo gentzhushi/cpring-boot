@@ -38,14 +38,17 @@ int main(void)
                 }
 
                 if (recv(c_sock, buf, BUFSIZ, 0) <= 0) {
-                        respond500(c_sock);
+                        respond(c_sock); // Default 500
                         close(c_sock);
                         continue;
                 }
 
                 request req = parse_request(buf, BUFSIZ);
+
                 print_request(req);
-                respond(c_sock, req);
+
+                respond(c_sock, .status = 200, .reason = "OK",
+                        .body = "Welcome to Clang Boot 0.1!");
 
                 close(c_sock);
         }
