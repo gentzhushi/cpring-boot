@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
                            "-o", "server.obj",
 
                    // Include Directories
-                           "-I./third_party",
+                           "-I./thirdparty",
 
                    // Translation Units
                            "src/main.c",
                            "src/request.c",
-                           "src/respond.c"
+                           "src/response.c"
                    );
 
         if (!cmd_run(&cmd)) {
