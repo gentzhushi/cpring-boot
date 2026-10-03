@@ -1,10 +1,13 @@
 .*
 
 tags
-*.sw?
 
+*.out
 *.obj
 *.o
 
 nob
-nob.old
+nob-*
+nob*.old
+
+*.dSYM
