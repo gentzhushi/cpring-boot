@@ -47,7 +47,7 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	char *next_token;
 
 	char *method	= buf;
-	next_token	= memchr(method, ' ', bufsiz) + 1;
+	next_token	= (char*)(memchr(method, ' ', bufsiz)) + 1;
 	size_t mlen	= (size_t)(next_token - method - 1);
 	struct cpring_sv method_str = {
 		.data	= method,
@@ -56,7 +56,7 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	req->method = cpring_http_method_from_str(method_str);
 
 	char *route	= next_token;
-	next_token	= memchr(route, ' ', bufsiz - mlen - 1) + 1;
+	next_token	= (char*)(memchr(route, ' ', bufsiz - mlen - 1)) + 1;
 	size_t rlen	= (size_t)(next_token - route - 1);
 	req->route = (struct cpring_sv) {
 		.data	= route,
@@ -64,7 +64,7 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	};
 
 	char *version	= next_token;
-	next_token	= memchr(version, '\r', bufsiz - rlen - 1) + 1;
+	next_token	= (char*)(memchr(version, '\r', bufsiz - rlen - 1)) + 1;
 	size_t vlen	= (size_t)(next_token - version - 1);
 	req->version = (struct cpring_sv) {
 		.data	= version,
@@ -75,7 +75,7 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	buf = next_token + 1;
 	while (!headers_done(buf)) {
 		char* line = buf;
-		buf = memchr(buf, '\n', bufsiz) + 1;
+		buf = (char*)(memchr(buf, '\n', bufsiz)) + 1;
 		size_t line_len = (buf - line - 2);
 		struct cpring_sv header_sv = {
 			.data	= line,

@@ -8,7 +8,6 @@
 #include "http/request.h"
 #include "http/response.h"
 
-
 struct cpring_app;
 
 struct cpring_app *cpring_new(int argc, char **argv);

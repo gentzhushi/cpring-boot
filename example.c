@@ -1,14 +1,12 @@
 #include <stdio.h>
 
-#include "cpring.h"
+#include "core/cpring.h"
 #include "http/status.h"
 
 void get_test(struct cpring_request *req, struct cpring_response *res)
 {
 	(void) req;
 	*res = (struct cpring_response) {
-		// .body = "",
-		// .headers = NULL,
 		.status = CPRING_HTTP_STATUS_ACCEPTED,
 		.version = CPRING_SV_LIT("1.1"),
 	};
@@ -20,8 +18,6 @@ void get_ok(struct cpring_request *req, struct cpring_response *res)
 {
 	(void) req;
 	*res = (struct cpring_response) {
-		// .body = "",
-		// .headers = NULL,
 		.status = CPRING_HTTP_STATUS_OK,
 		.version = CPRING_SV_LIT("1.1"),
 	};
@@ -31,6 +27,7 @@ void get_ok(struct cpring_request *req, struct cpring_response *res)
 
 int main(int argc, char **argv)
 {
+
 	struct cpring_app *app = cpring_new(argc, argv);
 
 	cpring_map_endpoint(app, CPRING_HTTP_METHOD_GET,

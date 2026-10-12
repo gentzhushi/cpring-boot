@@ -7,28 +7,23 @@ int main(int argc, char *argv[])
 {
 	GO_REBUILD_URSELF(argc, argv);
 
+	shift(argv, argc); // skip the program's name
+
+	String_View build_type = sv_from_cstr(shift(argv, argc));
+
+	nob_log(INFO, "build type: '"SV_Fmt"'\n", SV_Arg(build_type));
+
 	Cmd cmd = {0};
 	cmd_append(&cmd,
 		"cc", "-Wall", "-Wextra", "-pedantic",
-		/* "-fsanitize=address,undefined", */
+		"-fsanitize=address,undefined",
 		"-std=c23",
 		"-I./src",
 		"-I./thirdparty",
 
-#ifndef NOB_DEBUG
-		"-o", "app.out",
-#endif // NOB_DEBUG
-		
-#ifdef NOB_DEBUG
-		/* Debug */
-		"-O0",
-		"-g",
-		"-o", "app-debug.out",
-#endif // NOB_DEBUG
-
-		"src/cpring.c",
+		"example.c",
+		"src/core/cpring.c",
 		"src/ds/sv.c",
-		"src/main.c",
 		"src/http/request.c",
 		"src/http/header.c",
 		"src/http/response.c",
@@ -36,22 +31,26 @@ int main(int argc, char *argv[])
 		"src/http/method.c",
 	);
 
+	if (sv_eq(build_type, SVLIT("debug"))) {
+		cmd_append(&cmd, "-O0", "-g");
+	}
+
+	cmd_append(&cmd, "-o", "app.out");
+
 	if (!cmd_run(&cmd)) {
 		nob_log(ERROR, "Failed to build.");
 		return 1;
+	} else {
+		nob_log(INFO, "Built sucessfully.");
 	}
 
 	cmd.count = 0; // clear command
 
-#ifndef NOB_DEBUG
-	printf("TEST outta debug\n");
+	if (sv_eq(build_type, SVLIT("debug"))) {
+		cmd_append(&cmd, "lldb");
+	}
+
 	cmd_append(&cmd, "./app.out");
-#endif // NOB_DEBUG
-	
-#ifdef NOB_DEBUG
-	printf("TEST in debug\n");
-	cmd_append(&cmd, "lldb ./app-debug.out");
-#endif // NOB_DEBUG
 
 	return cmd_run(&cmd);
 }

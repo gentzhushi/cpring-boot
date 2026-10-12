@@ -4,8 +4,8 @@
 #include <stddef.h>
 
 struct cpring_sv {
-	const char	*data;
-	size_t		len;
+	char	*data;
+	size_t	len;
 };
 
 #define CPRING_SV_FMT		"%.*s"
