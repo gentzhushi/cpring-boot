@@ -15,7 +15,7 @@ It has no web framework; just POSIX sockets, a hand-written HTTP request parser,
 
 ## Building
 
-In order to build this project, all you need is a C compiler. The build is
+In order to build this project (the included example), all you need is a C compiler. The build is
 defined in `nob.c`. You compile it once:
 
 ```sh
