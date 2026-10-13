@@ -2,7 +2,6 @@
 #define CPRING_REQUEST_H_
 
 #include "ds/sv.h"
-
 #include "method.h"
 #include "header.h"
 
@@ -11,6 +10,7 @@ struct cpring_request {
 	struct cpring_sv		route;
 	struct cpring_sv		version;
 	enum cpring_http_method		method;
+	struct cJSON			*body;
 };
 
 

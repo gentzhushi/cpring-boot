@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+curl --json '{"file": "test.txt", "mode": "w", "data": "Test data for Cpring-Boot"}' \
+     -v localhost/write-file \

@@ -32,6 +32,7 @@ struct cpring_app {
 struct cpring_app *cpring_new(int argc, char** argv)
 {
 	(void) argc; (void) argv;
+	
 	// Parse CLI arguments:
 	//	--port 80,
 	//	--ip_addr (to bind to) 0.0.0.0,
@@ -121,7 +122,9 @@ int cpring_run(struct cpring_app *app)
 
 		cpring_request_print(req);
 
-		struct cpring_response res = {0};
+		struct cpring_response res = {
+			.version = CPRING_SV_LIT("1.1"),
+		};
 		struct cpring_endpoint *ep;
 
 		for (int i = 0; i < arrlen(app->endpoints); i++) {
@@ -133,7 +136,7 @@ int cpring_run(struct cpring_app *app)
 			}
 		}
 
-		cpring_response_print(res);
+		// cpring_response_print(res);
 		cpring_respond_with(c_sock, res);
 	}
 }

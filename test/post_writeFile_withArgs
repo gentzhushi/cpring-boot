@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+curl --json "{\"file\": \"$1\", \"mode\": \"$2\", \"data\": \"$3\"}" \
+     -v localhost/write-file

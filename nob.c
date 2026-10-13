@@ -8,12 +8,13 @@ int main(int argc, char *argv[])
 	GO_REBUILD_URSELF(argc, argv);
 
 	shift(argv, argc); // skip the program's name
+	String_View build_type = SVLIT("normal");
 
-	String_View build_type = sv_from_cstr(shift(argv, argc));
-
-	nob_log(INFO, "build type: '"SV_Fmt"'\n", SV_Arg(build_type));
+	if (argc > 0) 
+		build_type = sv_from_cstr(shift(argv, argc));
 
 	Cmd cmd = {0};
+
 	cmd_append(&cmd,
 		"cc", "-Wall", "-Wextra", "-pedantic",
 		"-fsanitize=address,undefined",
@@ -29,26 +30,24 @@ int main(int argc, char *argv[])
 		"src/http/response.c",
 		"src/http/status.c",
 		"src/http/method.c",
+
+		"thirdparty/cJSON.out",
 	);
 
-	if (sv_eq(build_type, SVLIT("debug"))) {
+	if (sv_eq(build_type, SVLIT("debug")))
 		cmd_append(&cmd, "-O0", "-g");
-	}
 
 	cmd_append(&cmd, "-o", "app.out");
 
-	if (!cmd_run(&cmd)) {
-		nob_log(ERROR, "Failed to build.");
+	if (!cmd_run(&cmd))
 		return 1;
-	} else {
-		nob_log(INFO, "Built sucessfully.");
-	}
+
+	nob_log(INFO, "Built sucessfully. Running...");
 
 	cmd.count = 0; // clear command
 
-	if (sv_eq(build_type, SVLIT("debug"))) {
+	if (sv_eq(build_type, SVLIT("debug")))
 		cmd_append(&cmd, "lldb");
-	}
 
 	cmd_append(&cmd, "./app.out");
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "stb_ds.h"
+#include "cJSON.h"
 
 #include "method.h"
 #include "request.h"
@@ -26,10 +27,14 @@ void cpring_request_print(struct cpring_request req)
 		       CPRING_SV_ARG(req.headers[i].key),
 		       CPRING_SV_ARG(req.headers[i].value));
 
-	printf("    header=(key=\""CPRING_SV_FMT"\", value=\""CPRING_SV_FMT
-	       "\")\n  )\n)\n",
+	printf("    header=(key=\""CPRING_SV_FMT"\", value=\""CPRING_SV_FMT"\")"
+	       "\n  )\n",
 	       CPRING_SV_ARG(req.headers[arrlen(req.headers)-1].key),
 	       CPRING_SV_ARG(req.headers[arrlen(req.headers)-1].value));
+
+	printf("  body=(\n    %s\n  )\n", cJSON_PrintUnformatted(req.body));
+
+	printf(")\n");
 }
 
 int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
@@ -44,10 +49,12 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	 * Message Body   ->
 	 */
 
-	char *next_token;
+	char *buf_end = buf + bufsiz;
+
+	char *next_token = buf;
 
 	char *method	= buf;
-	next_token	= (char*)(memchr(method, ' ', bufsiz)) + 1;
+	next_token	= (char*)(memchr(method, ' ', buf_end - next_token)) + 1;
 	size_t mlen	= (size_t)(next_token - method - 1);
 	struct cpring_sv method_str = {
 		.data	= method,
@@ -55,8 +62,14 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	};
 	req->method = cpring_http_method_from_str(method_str);
 
+	//						  bufsiz(47)
+	//						  ↓
+	// GET / HTTP/1.1\r\nContent-Type: application/json
+	//    ↑
+	//    next_token(3)
+
 	char *route	= next_token;
-	next_token	= (char*)(memchr(route, ' ', bufsiz - mlen - 1)) + 1;
+	next_token	= (char*)(memchr(route, ' ', buf_end - next_token - 1)) + 1;
 	size_t rlen	= (size_t)(next_token - route - 1);
 	req->route = (struct cpring_sv) {
 		.data	= route,
@@ -64,18 +77,19 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 	};
 
 	char *version	= next_token;
-	next_token	= (char*)(memchr(version, '\r', bufsiz - rlen - 1)) + 1;
+	next_token	= (char*)(memchr(version, '\r', buf_end - next_token - 1)) + 1;
 	size_t vlen	= (size_t)(next_token - version - 1);
 	req->version = (struct cpring_sv) {
 		.data	= version,
 		.len	= vlen,
 	};
 
-	/* next_token is already @ '\n', add 1 to skip current '\n' */
-	buf = next_token + 1;
+	buf = next_token + 1; // next_token is already @ '\n', add 1 to skip current '\n'
+
 	while (!headers_done(buf)) {
 		char* line = buf;
-		buf = (char*)(memchr(buf, '\n', bufsiz)) + 1;
+		buf = (char*)(memchr(buf, '\n', buf_end - buf - 1)) + 1;
+		// NOTE: May have an off-by-one error here:     ↑
 		size_t line_len = (buf - line - 2);
 		struct cpring_sv header_sv = {
 			.data	= line,
@@ -88,7 +102,20 @@ int cpring_parse_request(struct cpring_request *req, char* buf, size_t bufsiz)
 		arrput(req->headers, header);
 	}
 
-	/* parse_body() */
+	// When the loop is done, we're pointing at the beginning the empty 
+	// line. Next token is pointing here: "\r\n<body>"
+	//					↑
+	// 					next_token;
+	//
+	// So we add 2 to offset it to the start.
+
+	buf += 2;
+	printf("BODY_BUFFER: "CPRING_SV_FMT"\n", buf_end - buf, buf);
+
+	// we assume content-type is application/json
+
+	struct cJSON *body = cJSON_ParseWithLength(buf, (size_t)(buf_end - buf));
+	req->body = body;
 
 	return 0;
 }

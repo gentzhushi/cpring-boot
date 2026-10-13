@@ -12,7 +12,7 @@ struct cpring_response {
 	int				status;
 };
 
-// Call `_respond()` with default arguments
+// Call `cpring_respond_with()` with default arguments
 #define cpring_respond(c_sock, ...)					\
 cpring_respond_with(c_sock, (struct cpring_response){			\
 	.version	= CPRING_SV_LIT_INIT("1.1"),			\

@@ -47,7 +47,7 @@ void cpring_respond_with(int c_sock, struct cpring_response res)
 	);
 
 	send(c_sock, hdr_buf.data, hdr_buf.len, 0);
-	// free(hdr_buf.data);
+	free(hdr_buf.data);
 
 	return;
 }
